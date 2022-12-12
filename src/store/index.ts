@@ -4,6 +4,8 @@ import moment from 'moment';
 import { MonitorData, MonitorDataMock } from '@/shared/interfaces/monitorData.model';
 import { dateFormat } from '@/shared/constant/dateTemplate';
 
+const dataAmount = 50;
+
 export default createStore({
 	state: {
 		monitorData: MonitorDataMock as Array<MonitorData>,
@@ -23,14 +25,14 @@ export default createStore({
 		generateStartupData({ commit }) {
 			const startData: Array<MonitorData> = [];
 
-			for (let i = 0; i < 20; i++) {
+			for (let i = 0; i < dataAmount; i++) {
 				if (startData.length === 0) {
 					startData.push({
 						temperatureValue: _.random(60, 100),
 						temperatureDirection: _.random(0, 1) ? 'up' : 'down',
 						pressureValue: _.random(100, 150),
 						pressureDirection: _.random(0, 1) ? 'up' : 'down',
-						date: moment().subtract(20, 'seconds').format(dateFormat),
+						date: moment().subtract(dataAmount, 'seconds').format(dateFormat),
 					});
 				} else {
 					const tDirection: string = _.random(0, 1) ? 'up' : 'down';
@@ -39,9 +41,9 @@ export default createStore({
 					const prevPress: number = startData[i - 1].pressureValue;
 
 					startData.push({
-						temperatureValue: tDirection === 'up' ? prevTemp + _.random(1, 5) : prevTemp - _.random(1, 5),
+						temperatureValue: tDirection === 'up' ? prevTemp + _.random(1, 5) : prevTemp - _.random(1, 10),
 						temperatureDirection: tDirection,
-						pressureValue: pDirection === 'up' ? prevPress + _.random(5, 10) : prevPress - _.random(5, 10),
+						pressureValue: pDirection === 'up' ? prevPress + _.random(5, 10) : prevPress - _.random(5, 15),
 						pressureDirection: pDirection,
 						date: moment(startData[i - 1].date)
 							.add(1, 'second')

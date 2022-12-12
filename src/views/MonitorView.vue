@@ -23,11 +23,12 @@
 <script lang="ts">
 import { mapActions, mapGetters } from 'vuex';
 import { MonitorData, MonitorDataMock } from '@/shared/interfaces/monitorData.model';
+import { defineComponent } from 'vue';
 import _ from 'lodash';
 
 import ChartBox from '@/components/ChartBox.vue';
 
-export default {
+export default defineComponent({
 	components: { ChartBox },
 
 	data() {
@@ -51,22 +52,23 @@ export default {
 
 	methods: {
 		...mapActions(['generateStartupData', 'generateData']),
+
+		refresh() {
+			this.generateStartupData();
+		},
 	},
 
 	mounted() {
 		this.generateStartupData();
 		this.data = this.getData;
-
-		console.table(this.data);
-
+		// console.table(this.data);
 		clearInterval(this.dataInterval);
 		this.dataInterval = setInterval(() => {
 			this.generateData();
 			this.data.shift();
-
 			this.latestTemp = _.last(this.data)?.temperatureValue;
 			this.latestPress = _.last(this.data)?.pressureValue;
 		}, 1000);
 	},
-};
+});
 </script>
