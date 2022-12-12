@@ -3,12 +3,8 @@
 		<v-row>
 			<v-col>
 				<div class="d-flex align-center justify-center flex-column flex-sm-row">
-					<v-card title="Temperatura" max-width="500" class="ma-2 pa-5 w-50 text-center">
-						<div class="text-h2 font-weight-bold">{{ latestTemp }} &deg;C</div>
-					</v-card>
-					<v-card title="Ciśnienie" max-width="500" class="ma-2 pa-5 w-50 text-center">
-						<div class="text-h2 font-weight-bold">{{ latestPress }} psi</div>
-					</v-card>
+					<MonitorCard :latestData="latestTemp" />
+					<MonitorCard :latestData="latestPress" />
 				</div>
 			</v-col>
 		</v-row>
@@ -25,24 +21,7 @@
 			</v-col>
 		</v-row>
 
-		<v-table>
-			<thead>
-				<tr>
-					<th class="text-left">No.</th>
-					<th class="text-left">data</th>
-					<th class="text-left">temperatura</th>
-					<th class="text-left">ciśnienie</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="(row, idx) in monitorData" v-bind:key="row.date + row.temperatureValue">
-					<td>{{ idx + 1 }}</td>
-					<td>{{ row.date }}</td>
-					<td>{{ row.temperatureValue }}</td>
-					<td>{{ row.pressureValue }}</td>
-				</tr>
-			</tbody>
-		</v-table>
+		<MonitorTable :monitorData="monitorData" />
 	</v-container>
 </template>
 
@@ -54,9 +33,11 @@ import _ from 'lodash';
 import moment from 'moment';
 
 import ChartBox from '@/components/ChartBox.vue';
+import MonitorTable from '@/components/MonitorTable.vue';
+import MonitorCard from '@/components/MonitorCard.vue';
 
 export default defineComponent({
-	components: { ChartBox },
+	components: { ChartBox, MonitorTable, MonitorCard },
 
 	data() {
 		return {

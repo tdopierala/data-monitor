@@ -1,23 +1,42 @@
-export class dataGenerator {
-	// getStartupData() {
-	// }
+import _ from 'lodash';
+import moment from 'moment';
+import { MonitorData } from '../interfaces/monitorData.model';
+import { dateFormat } from '../constant/dateTemplate';
 
-	/* 	
-		generateData() {
-		const tDirection: string = _.random(0, 1) ? 'up' : 'down';
-		const pDirection: string = _.random(0, 1) ? 'up' : 'down';
-		const prevTemp: number = lastData.temperatureValue;
-		const prevPress: number = lastData.pressureValue;
+const temp = { min: 1, max: 10 };
+const press = { min: 5, max: 10 };
 
-		const temperatureValue: number = tDirection === 'up' ? prevTemp + _.random(temp.min, temp.max) : prevTemp - _.random(temp.min, temp.max);
-		const pressureValue: number = pDirection === 'up' ? prevPress + _.random(press.min, press.max) : prevPress - _.random(press.min, press.max);
+interface Limits {
+	min: number;
+	max: number;
+}
 
-		commit('setData', {
-			temperatureValue: temperatureValue > 0 ? temperatureValue : 0,
+export function limitValue(value: number, limits: Limits = { min: 0, max: 200 }): number {
+	return value < limits.min ? limits.min : value > limits.max ? limits.max : value;
+}
+
+export function randomizeDirection(): string {
+	return _.random(0, 1) ? 'up' : 'down';
+}
+
+export function getStartupData(data: Array<MonitorData>) {
+	const latestData: MonitorData | undefined = _.last(data);
+
+	if (latestData) {
+		const tDirection: string = randomizeDirection();
+		const pDirection: string = randomizeDirection();
+		const prevTemp: number = latestData.temperatureValue;
+		const prevPress: number = latestData.pressureValue;
+
+		const temperatureValue = tDirection === 'up' ? prevTemp + _.random(temp.min, temp.max) : prevTemp - _.random(temp.min, temp.max);
+		const pressureValue = pDirection === 'up' ? prevPress + _.random(press.min, press.max) : prevPress - _.random(press.min, press.max);
+
+		return {
+			temperatureValue: limitValue(temperatureValue),
 			temperatureDirection: tDirection,
-			pressureValue: pressureValue > 0 ? pressureValue : 0,
+			pressureValue: limitValue(pressureValue, { min: 0, max: 300 }),
 			pressureDirection: pDirection,
-			date: moment(lastData.date).add(1, 'second').format(dateFormat),
-		} as MonitorData);
-	} */
+			date: moment(latestData.date).add(1, 'second').format(dateFormat),
+		};
+	}
 }

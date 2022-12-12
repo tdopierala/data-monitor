@@ -3,6 +3,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import { MonitorData, MonitorDataMock } from '@/shared/interfaces/monitorData.model';
 import { dateFormat } from '@/shared/constant/dateTemplate';
+import { limitValue, randomizeDirection } from '@/shared/modules/dataGenerator';
 
 const dataAmount = 100;
 const temp = { min: 1, max: 10 };
@@ -31,14 +32,14 @@ export default createStore({
 				if (startData.length === 0) {
 					startData.push({
 						temperatureValue: _.random(60, 100),
-						temperatureDirection: _.random(0, 1) ? 'up' : 'down',
+						temperatureDirection: randomizeDirection(),
 						pressureValue: _.random(100, 150),
-						pressureDirection: _.random(0, 1) ? 'up' : 'down',
+						pressureDirection: randomizeDirection(),
 						date: moment().subtract(dataAmount, 'seconds').format(dateFormat),
 					});
 				} else {
-					const tDirection: string = _.random(0, 1) ? 'up' : 'down';
-					const pDirection: string = _.random(0, 1) ? 'up' : 'down';
+					const tDirection: string = randomizeDirection();
+					const pDirection: string = randomizeDirection();
 					const prevTemp: number = startData[i - 1].temperatureValue;
 					const prevPress: number = startData[i - 1].pressureValue;
 
@@ -46,14 +47,14 @@ export default createStore({
 					const pressureValue = pDirection === 'up' ? prevPress + _.random(press.min, press.max) : prevPress - _.random(press.min, press.max);
 
 					startData.push({
-						temperatureValue: temperatureValue > 0 ? temperatureValue : 0,
+						temperatureValue: limitValue(temperatureValue),
 						temperatureDirection: tDirection,
-						pressureValue: pressureValue > 0 ? pressureValue : 0,
+						pressureValue: limitValue(pressureValue),
 						pressureDirection: pDirection,
 						date: moment(startData[i - 1].date)
 							.add(1, 'second')
 							.format(dateFormat),
-					});
+					} as MonitorData);
 				}
 			}
 
@@ -64,8 +65,8 @@ export default createStore({
 			const lastData: MonitorData | undefined = _.last(state.monitorData);
 
 			if (lastData) {
-				const tDirection: string = _.random(0, 1) ? 'up' : 'down';
-				const pDirection: string = _.random(0, 1) ? 'up' : 'down';
+				const tDirection: string = randomizeDirection();
+				const pDirection: string = randomizeDirection();
 				const prevTemp: number = lastData.temperatureValue;
 				const prevPress: number = lastData.pressureValue;
 
@@ -73,9 +74,9 @@ export default createStore({
 				const pressureValue: number = pDirection === 'up' ? prevPress + _.random(press.min, press.max) : prevPress - _.random(press.min, press.max);
 
 				commit('setData', {
-					temperatureValue: temperatureValue > 0 ? temperatureValue : 0,
+					temperatureValue: limitValue(temperatureValue),
 					temperatureDirection: tDirection,
-					pressureValue: pressureValue > 0 ? pressureValue : 0,
+					pressureValue: limitValue(pressureValue),
 					pressureDirection: pDirection,
 					date: moment(lastData.date).add(1, 'second').format(dateFormat),
 				} as MonitorData);
